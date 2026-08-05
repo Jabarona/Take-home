@@ -1,6 +1,6 @@
 # 🍕 Aplicación de Menú de Restaurante & Carrito de Compras
 
-🚀 **Live Demo:** [https://tu-despliegue.vercel.app](https://tu-despliegue.vercel.app) *(Reemplazar con la URL real de despliegue)*
+
 
 Aplicación web moderna y ligera desarrollada para la gestión de menús de restaurante y recepción de pedidos en tiempo real. Construida con **Astro**, **Tailwind CSS** y un backend serverless sin costo utilizando **Google Sheets & Google Apps Script**.
 
@@ -41,5 +41,5 @@ Si dispusiera de una hora adicional de desarrollo, agregaría las siguientes mej
 3. **Integración con Pasarela de Pagos / WhatsApp:** Añadir la opción de redirigir el resumen del pedido a la API de WhatsApp Business del restaurante o integrar un botón de checkout directo con MercadoPago/Stripe.
 4. **Pruebas Automatizadas:** Implementar tests de integración E2E con Playwright para verificar la adición de ítems al carrito y el envío exitoso de la orden.
 
----
+
 
