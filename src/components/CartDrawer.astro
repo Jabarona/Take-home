@@ -1,0 +1,333 @@
+---
+// Componente de Panel Lateral / Carrito de Compras con Formulario de Checkout
+---
+
+<!-- Botón Flotante del Carrito -->
+<button
+  id="floating-cart-btn"
+  class="fixed bottom-6 right-6 z-40 bg-orange-600 hover:bg-orange-700 text-white p-4 rounded-full shadow-2xl hover:scale-105 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2 group cursor-pointer"
+  aria-label="Ver Carrito"
+>
+  <span class="text-2xl">🛒</span>
+  <span id="cart-badge" class="bg-white text-orange-600 font-extrabold text-xs px-2 py-0.5 rounded-full min-w-[20px] text-center shadow-sm">
+    0
+  </span>
+</button>
+
+<!-- Backdrop / Overlay del Carrito -->
+<div
+  id="cart-backdrop"
+  class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm z-50 opacity-0 pointer-events-none transition-opacity duration-300"
+></div>
+
+<!-- Panel Lateral (Drawer) -->
+<aside
+  id="cart-drawer"
+  class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col"
+>
+  <!-- Encabezado del Carrito -->
+  <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+    <div class="flex items-center gap-3">
+      <span class="text-2xl">🛍️</span>
+      <h2 class="text-xl font-bold text-slate-900">Tu Pedido</h2>
+    </div>
+    <button
+      id="close-cart-btn"
+      class="text-slate-400 hover:text-slate-700 hover:bg-slate-100 p-2 rounded-full transition-colors text-xl leading-none cursor-pointer"
+      aria-label="Cerrar Carrito"
+    >
+      ✕
+    </button>
+  </div>
+
+  <!-- Formulario General del Pedido -->
+  <form id="checkout-form" class="flex flex-col flex-grow overflow-hidden">
+    <!-- Lista de Ítems e Inputs del Cliente -->
+    <div class="flex-grow overflow-y-auto p-6 space-y-6">
+      
+      <!-- Mensaje de Éxito -->
+      <div id="success-banner" class="hidden bg-emerald-50 border border-emerald-200 text-emerald-800 p-4 rounded-2xl text-center space-y-2 animate-fade-in">
+        <span class="text-4xl block">🎉</span>
+        <h3 class="font-bold text-lg text-emerald-900">¡Pedido Enviado!</h3>
+        <p class="text-sm text-emerald-700">Tu orden ha sido registrada exitosamente en nuestro sistema.</p>
+      </div>
+
+      <!-- Mensaje de Error -->
+      <div id="error-banner" class="hidden bg-rose-50 border border-rose-200 text-rose-800 p-4 rounded-2xl text-sm flex items-start gap-3 animate-fade-in">
+        <span class="text-xl">⚠️</span>
+        <div>
+          <h4 class="font-bold text-rose-900">Error al procesar el pedido</h4>
+          <p id="error-message-text" class="text-xs text-rose-700 mt-0.5">Ocurrió un problema de conexión. Inténtalo de nuevo.</p>
+        </div>
+      </div>
+
+      <!-- Contenedor Dinámico de Productos -->
+      <div id="cart-items-container" class="space-y-4">
+        <!-- Se llena dinámicamente mediante JS -->
+      </div>
+
+      <!-- Sección de Formulario de Datos del Cliente -->
+      <div id="checkout-fields-section" class="pt-4 border-t border-slate-100 space-y-4 hidden">
+        <h3 class="font-bold text-slate-900 text-sm uppercase tracking-wider">Datos del Cliente</h3>
+        
+        <div>
+          <label for="cliente-nombre" class="block text-xs font-semibold text-slate-600 mb-1">Nombre Completo *</label>
+          <input
+            type="text"
+            id="cliente-nombre"
+            name="nombreCliente"
+            required
+            placeholder="Ej. Juan Pérez"
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all text-sm text-slate-800 bg-slate-50/50"
+          />
+        </div>
+
+        <div>
+          <label for="cliente-email" class="block text-xs font-semibold text-slate-600 mb-1">Correo Electrónico *</label>
+          <input
+            type="email"
+            id="cliente-email"
+            name="emailCliente"
+            required
+            placeholder="ejemplo@correo.com"
+            class="w-full px-4 py-3 rounded-xl border border-slate-200 focus:border-orange-500 focus:ring-2 focus:ring-orange-200 outline-none transition-all text-sm text-slate-800 bg-slate-50/50"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Pie del Carrito / Resumen y Botón de Envío -->
+    <div class="p-6 border-t border-slate-100 bg-slate-50/50 space-y-4">
+      <div class="space-y-2">
+        <div class="flex justify-between text-slate-500 text-sm">
+          <span>Subtotal</span>
+          <span id="cart-subtotal" class="font-medium text-slate-700">$0</span>
+        </div>
+        <div class="flex justify-between text-slate-900 text-lg font-bold pt-2 border-t border-slate-200">
+          <span>Total</span>
+          <span id="cart-total" class="text-orange-600">$0</span>
+        </div>
+      </div>
+
+      <button
+        type="submit"
+        id="submit-order-btn"
+        class="w-full bg-gradient-to-r from-orange-600 to-amber-500 hover:from-orange-700 hover:to-amber-600 text-white font-bold py-3.5 px-6 rounded-2xl shadow-lg hover:shadow-orange-500/25 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+        disabled
+      >
+        <span id="btn-text">Enviar Orden</span>
+        <span id="btn-spinner" class="hidden animate-spin h-5 w-5 border-2 border-white border-t-transparent rounded-full"></span>
+      </button>
+    </div>
+  </form>
+</aside>
+
+<script>
+  import { cartItems, isCartOpen, toggleCart, closeCart, updateQuantity, removeFromCart, clearCart } from '../store/cartStore.js';
+
+  const API_URL = 'https://script.google.com/macros/s/AKfycbzRpKcrsGOCEt0FecUlgKlPhXQ_woOs8v22wnZS6OnsekPzAJJaQ0mcAh6P0fGBMKvH/exec';
+
+  // Elementos del DOM
+  const floatingBtn = document.getElementById('floating-cart-btn');
+  const closeBtn = document.getElementById('close-cart-btn');
+  const backdrop = document.getElementById('cart-backdrop');
+  const drawer = document.getElementById('cart-drawer');
+  const badge = document.getElementById('cart-badge');
+  const itemsContainer = document.getElementById('cart-items-container');
+  const checkoutFieldsSection = document.getElementById('checkout-fields-section');
+  const subtotalEl = document.getElementById('cart-subtotal');
+  const totalEl = document.getElementById('cart-total');
+  const checkoutForm = document.getElementById('checkout-form') as HTMLFormElement;
+  const submitBtn = document.getElementById('submit-order-btn') as HTMLButtonElement;
+  const btnText = document.getElementById('btn-text');
+  const btnSpinner = document.getElementById('btn-spinner');
+  const successBanner = document.getElementById('success-banner');
+  const errorBanner = document.getElementById('error-banner');
+  const errorMessageText = document.getElementById('error-message-text');
+
+  const nombreInput = document.getElementById('cliente-nombre') as HTMLInputElement;
+  const emailInput = document.getElementById('cliente-email') as HTMLInputElement;
+
+  // Listeners de Apertura / Cierre
+  floatingBtn?.addEventListener('click', () => {
+    // Si abrimos el carrito manualmente, ocultar banners de respuesta previa
+    successBanner?.classList.add('hidden');
+    errorBanner?.classList.add('hidden');
+    toggleCart();
+  });
+  closeBtn?.addEventListener('click', closeCart);
+  backdrop?.addEventListener('click', closeCart);
+
+  // Suscribirse a la visibilidad del Carrito
+  isCartOpen.subscribe((open) => {
+    if (open) {
+      backdrop?.classList.remove('opacity-0', 'pointer-events-none');
+      drawer?.classList.remove('translate-x-full');
+    } else {
+      backdrop?.classList.add('opacity-0', 'pointer-events-none');
+      drawer?.classList.add('translate-x-full');
+    }
+  });
+
+  // Suscribirse a cambios en los Ítems del Carrito
+  cartItems.subscribe((items) => {
+    // 1. Contador de productos
+    const totalCount = items.reduce((acc, item) => acc + item.cantidad, 0);
+    if (badge) badge.textContent = String(totalCount);
+
+    // 2. Totales
+    const totalAmount = items.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+    const formattedTotal = `$${totalAmount.toLocaleString('es-CO')}`;
+
+    if (subtotalEl) subtotalEl.textContent = formattedTotal;
+    if (totalEl) totalEl.textContent = formattedTotal;
+
+    // Habilitar/Deshabilitar botón de envío
+    if (submitBtn) submitBtn.disabled = items.length === 0;
+
+    // Mostrar u ocultar sección de datos del cliente
+    if (checkoutFieldsSection) {
+      if (items.length > 0) {
+        checkoutFieldsSection.classList.remove('hidden');
+      } else {
+        checkoutFieldsSection.classList.add('hidden');
+      }
+    }
+
+    // 3. Renderizar Lista de Productos
+    if (!itemsContainer) return;
+
+    if (items.length === 0) {
+      // Si el banner de éxito está visible, no mostrar la cara triste
+      if (successBanner && !successBanner.classList.contains('hidden')) {
+        itemsContainer.innerHTML = '';
+        return;
+      }
+
+      itemsContainer.innerHTML = `
+        <div class="h-full flex flex-col items-center justify-center text-center py-12">
+          <span class="text-5xl mb-4 opacity-40">🛒</span>
+          <p class="text-slate-500 font-medium">Tu carrito está vacío</p>
+          <p class="text-slate-400 text-sm mt-1">¡Agrega algunos deliciosos platos para comenzar!</p>
+        </div>
+      `;
+      return;
+    }
+
+    itemsContainer.innerHTML = items.map((item) => `
+      <div class="bg-white p-4 rounded-2xl border border-slate-100 shadow-sm flex items-center justify-between gap-4">
+        <div class="flex-grow min-w-0">
+          <h4 class="font-bold text-slate-900 text-sm truncate">${item.nombre}</h4>
+          <p class="text-xs text-orange-600 font-semibold mt-0.5">$${item.precio.toLocaleString('es-CO')} c/u</p>
+        </div>
+
+        <!-- Controles de Cantidad -->
+        <div class="flex items-center gap-2 bg-slate-100 p-1 rounded-xl">
+          <button
+            type="button"
+            class="decrease-btn w-7 h-7 flex items-center justify-center bg-white text-slate-700 rounded-lg text-sm font-bold shadow-xs hover:bg-slate-200 transition-colors cursor-pointer"
+            data-id="${item.id}"
+          >-</button>
+          <span class="text-xs font-bold w-5 text-center text-slate-800">${item.cantidad}</span>
+          <button
+            type="button"
+            class="increase-btn w-7 h-7 flex items-center justify-center bg-white text-slate-700 rounded-lg text-sm font-bold shadow-xs hover:bg-slate-200 transition-colors cursor-pointer"
+            data-id="${item.id}"
+          >+</button>
+        </div>
+
+        <!-- Botón Eliminar -->
+        <button
+          type="button"
+          class="remove-btn text-slate-300 hover:text-red-500 p-1 transition-colors text-base cursor-pointer"
+          data-id="${item.id}"
+          title="Eliminar del carrito"
+        >
+          🗑️
+        </button>
+      </div>
+    `).join('');
+
+    // Event Listeners dinámicos
+    itemsContainer.querySelectorAll('.decrease-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id;
+        if (id) updateQuantity(id, -1);
+      });
+    });
+
+    itemsContainer.querySelectorAll('.increase-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id;
+        if (id) updateQuantity(id, 1);
+      });
+    });
+
+    itemsContainer.querySelectorAll('.remove-btn').forEach((btn) => {
+      btn.addEventListener('click', (e) => {
+        const id = (e.currentTarget as HTMLElement).dataset.id;
+        if (id) removeFromCart(id);
+      });
+    });
+  });
+
+  // Manejador del Submit de la Orden (POST a Google Apps Script)
+  checkoutForm?.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const currentItems = cartItems.get();
+    if (currentItems.length === 0) return;
+
+    const nombreCliente = nombreInput?.value.trim();
+    const emailCliente = emailInput?.value.trim();
+
+    if (!nombreCliente || !emailCliente) return;
+
+    const total = currentItems.reduce((acc, item) => acc + (item.precio * item.cantidad), 0);
+
+    const payload = {
+      nombreCliente,
+      emailCliente,
+      itemsJson: JSON.stringify(currentItems),
+      total
+    };
+
+    // UI State: Loading
+    if (submitBtn) submitBtn.disabled = true;
+    if (btnText) btnText.textContent = 'Enviando Orden...';
+    if (btnSpinner) btnSpinner.classList.remove('hidden');
+    errorBanner?.classList.add('hidden');
+    successBanner?.classList.add('hidden');
+
+    try {
+      // Usamos text/plain en las cabeceras para evitar preflight (OPTIONS) de CORS en Google Apps Script
+      const response = await fetch(API_URL, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (data.success || response.ok) {
+        // UI State: Éxito
+        clearCart();
+        checkoutForm.reset();
+        if (successBanner) successBanner.classList.remove('hidden');
+      } else {
+        throw new Error(data.error || 'No se pudo registrar la orden.');
+      }
+    } catch (err: any) {
+      console.error('Error al enviar la orden:', err);
+      if (errorMessageText) errorMessageText.textContent = err.message || 'Error de conexión con el servidor.';
+      if (errorBanner) errorBanner.classList.remove('hidden');
+    } finally {
+      // Restaurar estado del botón
+      if (submitBtn) submitBtn.disabled = cartItems.get().length === 0;
+      if (btnText) btnText.textContent = 'Enviar Orden';
+      if (btnSpinner) btnSpinner.classList.add('hidden');
+    }
+  });
+</script>

@@ -1,0 +1,122 @@
+---
+import '../styles/global.css';
+import CartDrawer from '../components/CartDrawer.astro';
+
+const API_URL = 'https://script.google.com/macros/s/AKfycbzRpKcrsGOCEt0FecUlgKlPhXQ_woOs8v22wnZS6OnsekPzAJJaQ0mcAh6P0fGBMKvH/exec';
+
+interface MenuItem {
+  id: string | number;
+  nombre: string;
+  descripcion: string;
+  precio: number;
+}
+
+let menuItems: MenuItem[] = [];
+try {
+  const response = await fetch(API_URL, { redirect: 'follow' });
+  if (response.ok) {
+    menuItems = await response.json();
+  } else {
+    console.error('Error al obtener el menú:', response.statusText);
+  }
+} catch (error) {
+  console.error('Error de red en el fetch del menú:', error);
+}
+---
+
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width" />
+    <meta name="generator" content={Astro.generator} />
+    <title>Menú del Restaurante</title>
+  </head>
+  <body class="bg-slate-50 text-slate-800 font-sans min-h-screen selection:bg-orange-200 selection:text-orange-900 pb-24">
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+      
+      <!-- Cabecera del Menú -->
+      <header class="mb-16 text-center">
+        <h1 class="text-4xl md:text-5xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-orange-600 to-amber-500 tracking-tight mb-4">
+          Nuestro Menú
+        </h1>
+        <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+          Descubre nuestra selección de platos preparados con ingredientes frescos de la más alta calidad.
+        </p>
+      </header>
+
+      <!-- Grilla de Productos -->
+      {menuItems.length === 0 ? (
+        <div class="text-center py-20 bg-white rounded-3xl shadow-sm border border-slate-100">
+          <p class="text-xl text-slate-500">Cargando menú o no hay platos disponibles por el momento...</p>
+        </div>
+      ) : (
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {menuItems.map((item) => (
+            <article class="group bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden hover:shadow-xl hover:-translate-y-1.5 transition-all duration-300 flex flex-col h-full">
+              
+              <!-- Imagen Placeholder -->
+              <div class="h-48 w-full bg-gradient-to-br from-slate-100 to-orange-50 flex items-center justify-center border-b border-slate-50 relative overflow-hidden">
+                <span class="text-6xl opacity-30 group-hover:scale-110 group-hover:opacity-50 transition-all duration-500 ease-out">🍽️</span>
+              </div>
+
+              <!-- Contenido de la Tarjeta -->
+              <div class="p-6 flex flex-col flex-grow">
+                <div class="flex justify-between items-start gap-4 mb-3">
+                  <h2 class="text-xl font-bold text-slate-900 leading-tight">
+                    {item.nombre}
+                  </h2>
+                </div>
+                
+                <p class="text-slate-500 text-sm leading-relaxed flex-grow mb-6 line-clamp-3">
+                  {item.descripcion}
+                </p>
+
+                <!-- Precio y Botón de Agregar -->
+                <div class="flex items-center justify-between mt-auto pt-4 border-t border-slate-100 gap-4">
+                  <div class="flex flex-col">
+                    <span class="text-slate-400 text-xs font-medium uppercase tracking-wider">Precio</span>
+                    <span class="text-xl font-black text-orange-600">
+                      ${item.precio}
+                    </span>
+                  </div>
+
+                  <button
+                    class="add-to-cart-btn bg-orange-50 hover:bg-orange-600 text-orange-600 hover:text-white font-bold px-4 py-2.5 rounded-xl transition-all duration-200 flex items-center gap-2 text-sm cursor-pointer shadow-xs hover:shadow-md active:scale-95"
+                    data-id={item.id}
+                    data-nombre={item.nombre}
+                    data-precio={item.precio}
+                  >
+                    <span>+ Agregar</span>
+                  </button>
+                </div>
+              </div>
+            </article>
+          ))}
+        </div>
+      )}
+
+      <!-- Componente del Carrito Lateral -->
+      <CartDrawer />
+
+    </main>
+
+    <script>
+      import { addToCart } from '../store/cartStore.js';
+
+      // Event listeners para los botones "Agregar al carrito"
+      document.querySelectorAll('.add-to-cart-btn').forEach((button) => {
+        button.addEventListener('click', (e) => {
+          const btn = e.currentTarget as HTMLElement;
+          const id = btn.dataset.id;
+          const nombre = btn.dataset.nombre;
+          const precio = Number(btn.dataset.precio);
+
+          if (id && nombre && !isNaN(precio)) {
+            addToCart({ id, nombre, precio });
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
