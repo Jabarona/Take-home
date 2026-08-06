@@ -4,7 +4,8 @@
 
 Aplicación web moderna y ligera desarrollada para la gestión de menús de restaurante y recepción de pedidos en tiempo real. Construida con **Astro**, **Tailwind CSS** y un backend serverless sin costo utilizando **Google Sheets & Google Apps Script**.
 
-🚀 **Live Demo:** [https://quiet-kitsune-ca5770.netlify.app](https://tu-sitio.netlify.app)
+🚀 **Live Demo:** [https://quiet-kitsune-ca5770.netlify.app](https://quiet-kitsune-ca5770.netlify.app)
+
 
 ## 🛠️ Stack Tecnológico
 
